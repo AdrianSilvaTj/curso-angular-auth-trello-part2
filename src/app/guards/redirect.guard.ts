@@ -6,8 +6,9 @@ import { TokenService } from "@services/token.service";
 export const RedirectGuard: CanActivateFn = () => {
   const tokenService = inject(TokenService);
   const router = inject(Router);
-  const token = tokenService.getToken();
-  if (token) {
+
+  const isValidToken = tokenService.isValidRefreshToken();
+  if (isValidToken) {
     router.navigate(['/app']);
     return false;
   }

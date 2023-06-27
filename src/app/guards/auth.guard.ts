@@ -6,8 +6,9 @@ import { Observable } from 'rxjs';
 export const AuthGuard: CanActivateFn = () => {
   const tokenService = inject(TokenService);
   const router = inject(Router);
-  const token = tokenService.getToken();
-  if (!token) {
+
+  const isValidToken = tokenService.isValidRefreshToken();
+  if (!isValidToken) {
     router.navigate(['/login']);
     return false;
   }

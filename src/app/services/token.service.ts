@@ -37,11 +37,9 @@ export class TokenService {
 
   /* Si hay un token lo decodifica y se verifica si la fecha de expiración es mayor a la fecha actual
   (estas fechas estan codificadas en segundos) */
-  isValidToken(invalid?:boolean){
+  isValidToken(){
     const token = this.getToken();
-    if(!token || invalid){
-      console.log('****************************');
-
+    if(!token){
       return false;
     }
 

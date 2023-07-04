@@ -22,11 +22,10 @@ export class NavbarComponent{
 
   isOpenOverlayAvatar = false;
   isOpenOverlayBoards = false;
+  isOpenOverlayCreateBoards = false;
 
   user$= this.authService.user$;
   avatar= '/assets/svg/no-avatar.png'
-
-  ValidOfToken = this.tokenService.isValidToken();
 
   constructor(
     private authService: AuthService,
@@ -37,11 +36,6 @@ export class NavbarComponent{
   logout(){
     this.authService.logout();
     this.router.navigate(['/login']);
-  }
-
-  invalidToken(invalid: boolean){
-    this.ValidOfToken=this.tokenService.isValidToken(invalid);
-
   }
 
 }

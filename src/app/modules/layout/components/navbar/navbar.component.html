@@ -174,7 +174,7 @@
       (overlayOutsideClick)="isOpenOverlayCreateBoards = !isOpenOverlayCreateBoards"
   >
     <div
-      class="z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow w-60"
+      class="z-50 justify-center my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow w-72"
     >
       <div class="relative px-4 py-2 text-center">
         <span class="block text-gray-900 text-normal">Create new Boards</span>
@@ -185,7 +185,9 @@
           <fa-icon [icon]="faClose"></fa-icon>
         </button>
       </div>
-      <div class="flex justify-between px-4 py-3">Content</div>
+      <div class="flex justify-between px-4 py-3">
+        <app-board-form (showOverlay)="close($event)"></app-board-form>
+      </div>
     </div>
 
   </ng-template>

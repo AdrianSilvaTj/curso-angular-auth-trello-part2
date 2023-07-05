@@ -13,6 +13,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Board } from '@models/board.model';
 import { Card } from '@models/card.model';
 import { CardsService } from '@services/cards.service';
+import { map, tap } from 'rxjs';
+import { List } from '@models/list.model';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-board',
@@ -31,6 +34,9 @@ import { CardsService } from '@services/cards.service';
 export class BoardComponent implements OnInit {
 
   board: Board | null = null;
+  formCard= new FormControl<string>('',{
+    nonNullable:true, validators: [Validators.required]
+  });
 
   constructor(
     private dialog: Dialog,
@@ -50,6 +56,13 @@ export class BoardComponent implements OnInit {
 
   private getBoard(id: string) {
     this.boardsService.getBoard(id)
+    //.showForm, es un estado de cada list del board que se utiliza cuando se presiona el boton de
+    // agregar card, para mostros u ocultar el input que aparece
+    .pipe(
+      tap(
+        // se inicializa en false
+        board => board.lists.map(list=> list.showForm = false))
+    )
     .subscribe(board =>{
       this.board = board
     })
@@ -118,6 +131,17 @@ export class BoardComponent implements OnInit {
     });
   }
 
-
+  /* Deja abierto solo el form de la lista que seleccionamos */
+  openFormCard(listSel: List){
+    if(this.board?.lists){
+      if(!listSel.showForm){
+        this.board.lists.map(list => {
+          list.id === listSel.id ? list.showForm = true : list.showForm = false
+        })
+      }else{
+        console.log(this.formCard.value);
+      }
+    }
+  }
 
 }

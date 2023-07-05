@@ -32,10 +32,10 @@ export type Colors =
       'text-white': true,
     },
     red: {
-      'bg-red-200': true,
-      'hover:bg-red-500': true,
-      'focus:ring-red-50': true,
-      'text-white-700': true,
+      'bg-red-700': true,
+      'hover:bg-red-800': true,
+      'focus:ring-red-300': true,
+      'text-white': true,
     },
     violet: {
       'bg-violet-700': true,

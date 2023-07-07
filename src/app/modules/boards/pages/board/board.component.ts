@@ -13,9 +13,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Board } from '@models/board.model';
 import { Card } from '@models/card.model';
 import { CardsService } from '@services/cards.service';
-import { map, tap } from 'rxjs';
+import { map, tap, switchMap } from 'rxjs';
 import { List } from '@models/list.model';
 import { FormControl, Validators } from '@angular/forms';
+import { ListService } from '@services/list.service';
 
 @Component({
   selector: 'app-board',
@@ -34,38 +35,49 @@ import { FormControl, Validators } from '@angular/forms';
 export class BoardComponent implements OnInit {
 
   board: Board | null = null;
-  formCard= new FormControl<string>('',{
-    nonNullable:true, validators: [Validators.required]
+  inputCard = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.required],
   });
+  inputList = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.required],
+  });
+  showListForm = false;
 
   constructor(
     private dialog: Dialog,
-    private route : ActivatedRoute,
+    private route: ActivatedRoute,
     private boardsService: BoardsService,
-    private cardsService: CardsService
+    private cardsService: CardsService,
+    private listService: ListService
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params =>{
+    this.boardsService.board$.subscribe((board) => (this.board = board));
+    this.route.paramMap.subscribe((params) => {
       const id = params.get('boardId');
       if (id) {
-        this.getBoard(id)
+        this.getBoard(id);
       }
-    })
+    });
   }
 
   private getBoard(id: string) {
-    this.boardsService.getBoard(id)
-    //.showForm, es un estado de cada list del board que se utiliza cuando se presiona el boton de
-    // agregar card, para mostros u ocultar el input que aparece
-    .pipe(
-      tap(
-        // se inicializa en false
-        board => board.lists.map(list=> list.showForm = false))
-    )
-    .subscribe(board =>{
-      this.board = board
-    })
+    this.boardsService
+      .getBoard(id)
+      //.showForm, es un estado de cada list del board que se utiliza cuando se presiona el boton de
+      // agregar card, para mostros u ocultar el input que aparece
+      .pipe(
+        tap(
+          // se inicializa en false
+          (board) => board.lists.map((list) => (list.showForm = false))
+        )
+      )
+      .subscribe((board) => {
+        console.log('board', board);
+        this.board = board;
+      });
   }
 
   /* Funcion que se ejecuta cuando soltamos una card luego de moverla,
@@ -92,23 +104,26 @@ export class BoardComponent implements OnInit {
       );
     }
     // calculamos la posición de la card que se movió
-    const pos=this.boardsService.getPosition(event.container.data, event.currentIndex);
+    const pos = this.boardsService.getPosition(
+      event.container.data,
+      event.currentIndex
+    );
+
     // obtenemos la card
     const card = event.container.data[event.currentIndex];
     // obtenemos el id de la lista a la que se movió
     const listId = event.container.id;
     // Actualizamos la card
     this.updateCard(card, pos, listId);
-
   }
 
   /* Actualiza la posicion de la card */
-  private updateCard(card: Card, position:number, listId:string){
-    this.cardsService.update(card.id, {position, listId})
-    .subscribe((cardUpdated) => {
-      console.log(cardUpdated);
-
-    })
+  private updateCard(card: Card, position: number, listId: string) {
+    this.cardsService
+      .update(card.id, { position, listId })
+      .subscribe((cardUpdated) => {
+        console.log(cardUpdated);
+      });
   }
 
   addColumn() {
@@ -132,15 +147,35 @@ export class BoardComponent implements OnInit {
   }
 
   /* Deja abierto solo el form de la lista que seleccionamos */
-  openFormCard(listSel: List){
-    if(this.board?.lists){
-      if(!listSel.showForm){
-        this.board.lists.map(list => {
-          list.id === listSel.id ? list.showForm = true : list.showForm = false
-        })
-      }else{
-        console.log(this.formCard.value);
-      }
+  openFormCard(listSel: List) {
+    const board = this.board;
+    if (board?.lists) {
+      board.lists.map((list) => {
+        list.id === listSel.id
+          ? (list.showForm = true)
+          : (list.showForm = false);
+      });
+    }
+  }
+
+  saveCard(listSel: List) {
+    this.cardsService.newCard(this.inputCard.value, listSel, this.board!.id);
+    this.inputCard.reset();
+    listSel.showForm = false;
+  }
+
+  addList(){
+    if (this.board){
+      this.listService.create({
+        title: this.inputList.value,
+        boardId: this.board!.id,
+        position: this.boardsService.getPositionNewElement(this.board.lists),
+      }).subscribe(list => {
+        // se agrega la lista al array, pero debido a que el backend no retorna un Array de cards, se lo agregamos
+        this.board?.lists.push({...list, cards:[]});
+        this.showListForm = false;
+        this.inputList.reset();
+      })
     }
   }
 

@@ -8,7 +8,7 @@ export interface Card {
   list: List;
 }
 
-export interface UpdateCardDto {
+export interface CreateUpdateCardDto {
   title?: string;
   description?: string;
   position?: number;

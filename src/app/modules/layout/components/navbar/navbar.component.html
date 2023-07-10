@@ -1,5 +1,5 @@
 <ng-container *ngIf="user$ | async as user">
-  <nav class="px-6 border-gray-200 shadow-md bg-sky-700">
+  <nav class="px-6 border-gray-200 shadow-md" [ngClass]="colors">
     <div class="flex flex-wrap items-center justify-between">
       <div class="flex items-center">
         <a routerLink="/app">
@@ -14,7 +14,7 @@
           <ul class="flex items-center space-x-2 text-sm font-medium">
             <li>
               <app-btn
-                color="sky"
+                [color]="bgColor"
                 (click)="isOpenOverlayBoards = !isOpenOverlayBoards"
                 cdkOverlayOrigin
                 #boardsOverlay="cdkOverlayOrigin"
@@ -33,7 +33,7 @@
             <li>
               <app-btn
                 typeBtn="button"
-                color="sky"
+                [color]="bgColor"
                 cdkOverlayOrigin
                 (click)="isOpenOverlayCreateBoards = !isOpenOverlayCreateBoards"
                 #createBoardOverlay="cdkOverlayOrigin"

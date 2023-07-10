@@ -1,3 +1,4 @@
+import { BoardsService } from './../../../../services/boards.service';
 import { MeService } from './../../../../services/me.service';
 import { Component, OnInit } from '@angular/core';
 import { faBox, faWaveSquare, faClock, faAngleUp, faAngleDown, faHeart, faBorderAll, faUsers, faGear } from '@fortawesome/free-solid-svg-icons';
@@ -23,12 +24,12 @@ export class BoardsComponent implements OnInit {
   boards: Board[] =[];
 
   constructor(
-    private meService: MeService,
+    private meService: MeService
   ) { }
 
-    ngOnInit(){
-      this.getMeBoards();
-    }
+  ngOnInit(){
+    this.getMeBoards();
+  }
 
   getMeBoards(){
     this.meService.getMeBoards().subscribe(boards =>{

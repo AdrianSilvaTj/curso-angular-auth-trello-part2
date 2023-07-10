@@ -1,5 +1,5 @@
 import { BoardsService } from './../../../../services/boards.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -17,6 +17,7 @@ import { map, tap, switchMap } from 'rxjs';
 import { List } from '@models/list.model';
 import { FormControl, Validators } from '@angular/forms';
 import { ListService } from '@services/list.service';
+import { BACKGROUND } from '@models/colors.model';
 
 @Component({
   selector: 'app-board',
@@ -32,7 +33,7 @@ import { ListService } from '@services/list.service';
     `,
   ],
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent implements OnInit, OnDestroy {
 
   board: Board | null = null;
   inputCard = new FormControl<string>('', {
@@ -44,6 +45,7 @@ export class BoardComponent implements OnInit {
     validators: [Validators.required],
   });
   showListForm = false;
+  colorBackground = BACKGROUND;
 
   constructor(
     private dialog: Dialog,
@@ -63,6 +65,11 @@ export class BoardComponent implements OnInit {
     });
   }
 
+  /* Este metodo se ejecuta cada vez que se sale del componente */
+  ngOnDestroy(): void {
+    this.boardsService.setBackgroundColor('sky');
+  }
+
   private getBoard(id: string) {
     this.boardsService
       .getBoard(id)
@@ -75,8 +82,9 @@ export class BoardComponent implements OnInit {
         )
       )
       .subscribe((board) => {
-        console.log('board', board);
         this.board = board;
+        // seteamos el color del background del navbar
+        this.boardsService.setBackgroundColor(this.board.backgroundColor);
       });
   }
 
@@ -126,13 +134,6 @@ export class BoardComponent implements OnInit {
       });
   }
 
-  addColumn() {
-    // this.columns.push({
-    //   title: 'New Column',
-    //   todos: [],
-    // });
-  }
-
   openDialog(card: Card) {
     const dialogRef = this.dialog.open(TodoDialogComponent, {
       minWidth: '300px',
@@ -177,6 +178,14 @@ export class BoardComponent implements OnInit {
         this.inputList.reset();
       })
     }
+  }
+
+  get colors(){
+    if(this.board){
+      const classes = this.colorBackground[this.board.backgroundColor];
+      return classes ? classes : {};
+    }
+    return {};
   }
 
 }

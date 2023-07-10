@@ -1,3 +1,5 @@
+import { NAVBARBACKGROUND, Colors } from '@models/colors.model';
+import { BoardsService } from './../../../../services/boards.service';
 import { TokenService } from '@services/token.service';
 import { AuthService } from '@services/auth.service';
 import { Component, OnInit } from '@angular/core';
@@ -14,7 +16,7 @@ import { User } from '@models/user.model';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
 })
-export class NavbarComponent{
+export class NavbarComponent implements OnInit {
   faBell = faBell;
   faInfoCircle = faInfoCircle;
   faClose = faClose;
@@ -25,13 +27,20 @@ export class NavbarComponent{
   isOpenOverlayCreateBoards = false;
 
   user$= this.authService.user$;
-  avatar= '/assets/svg/no-avatar.png'
+  avatar= '/assets/svg/no-avatar.png';
+  bgColor: Colors = 'sky';
+  background = NAVBARBACKGROUND
 
   constructor(
     private authService: AuthService,
     private router: Router,
+    private boardsService : BoardsService,
     private tokenService : TokenService
   ) {}
+
+  ngOnInit(): void {
+    this.boardsService.backgroundColor$.subscribe(color => this.bgColor = color);
+  }
 
   logout(){
     this.authService.logout();
@@ -40,6 +49,11 @@ export class NavbarComponent{
 
   close(event: boolean){
     this.isOpenOverlayCreateBoards = event;
+  }
+
+  get colors(){
+    const classes = this.background[this.bgColor];
+    return classes ? classes : {};
   }
 
 }

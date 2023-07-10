@@ -17,6 +17,7 @@ export class BoardsService {
   bufferSpace = 65535;
   board = new BehaviorSubject<Board | null>(null);
   board$ = this.board.asObservable();
+  backgroundColor$ = new BehaviorSubject<Colors>('sky');
 
   constructor(
     private http: HttpClient,
@@ -70,6 +71,10 @@ export class BoardsService {
 
   createBoard(title: string, backgroundColor: Colors){
     return this.http.post<Board>(`${this.apiUrl}/boards`, {title, backgroundColor}, {context: checkToken()})
+  }
+
+  setBackgroundColor(color: Colors){
+    this.backgroundColor$.next(color)
   }
 
 }
